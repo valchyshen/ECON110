@@ -1,7 +1,8 @@
 #
-#  ECON110 | Spring 2022, MCC-Longview
-#
+#  ECON110 Tools.R        <<-- SAVE THE FILE WITH THIS NAME IN YOUR RStuio.Cloud 
 #  
+#  Spring 2022, MCC-Longview
+#
 #  List of functions:
 #  
 #  1. use.library(p)   -- if library p is not installed it is being installed
