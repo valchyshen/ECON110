@@ -1,4 +1,4 @@
-# ECON110
-R code for the ECON110 course
+# ECON110 Project
 
-This is explanation of the files listed in this folder.
+The ECON110 course project consists of step-by-step construction of a R file, which retreives the economic data from primary providers such as FRED, BEA, BLS, Census.gov and others.
+  
