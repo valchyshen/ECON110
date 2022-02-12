@@ -61,8 +61,6 @@ bls.cpi.yoy <- function(b,r) {
 # ------------------------  OPERATIONS  ----------------------------------------+
 
 # Checking if libraries being installed already or not
-use.library("blsAPI")
-use.library("ggplot2")
 use.library("stats")
 use.library("zoo")
 use.library("x12")
