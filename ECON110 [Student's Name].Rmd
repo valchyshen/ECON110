@@ -10,15 +10,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 # Use the ECON110 Tools file, which is provided by the course's instructor
-source("ECON110 Tools.R")
+source("C:/R/ECON110 Tools.R")
 
 # R libraries are being attached to this project
 library(fredr)
 library(bea.R)
 library(tidycensus)
 library(ggplot2)
-# library(devtools)
-# install_github("mikeasilva/blsAPI")
 library(blsAPI)
 
 # My access keys, which will be used in this project
