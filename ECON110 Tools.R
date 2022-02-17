@@ -8,8 +8,10 @@
 #  1. use.library(p)   -- if library p is not installed it is being installed
 #  2. bls.cpi.idx(b,r) -- transforms BLS data set into a data frame into a 
 #                         user-friendly format, where CPI is index
-#  2. bls.cpi.yoy(b,r) -- transforms BLS data set into a data frame into a 
+#  3. bls.cpi.yoy(b,r) -- transforms BLS data set into a data frame into a 
 #                         user-friendly format, where CPI is YoY change
+#  4. bls.cpi.item_name(d,l) -- this function attaches new column to the data
+#                         set d, the new column contains the label l  
 
 # ------------------------  FUNCTIONS  -----------------------------------------+
 
@@ -50,13 +52,30 @@ bls.cpi.yoy <- function(b,r) {
   # Converting the data set into time series format
   b.ts    <- ts(b$value, start = c(b$year[1],month(b$date[1])), frequency = 12)
   c       <- (b.ts/lag(b.ts,-12)-1)*100   # Calculation of year-on-year change in the data
-  print(paste("% year-on-year change of",r))# Printing a text label in the output file
+  n       <- cpi.items[cpi.items$item_code==substr(r,9,nchar(r)),]$item_name
+  print(paste("% year-on-year change of",r,",",n))    # Printing a text label in the output file
   print(round(c,2))                       # Printing a table with YoY changes in the output file
   #ts.plot(c)                             # Printing a graph with YoY changes in the output file
   #plot(x12(c), forecast=TRUE)            # Printing a graph with YoY chg + forecast
   # data frame
-  df <- data.frame(date=as.Date(stats::time(c)),value=as.numeric(c),seriesID=r)
+  df <- data.frame(date      = as.Date(stats::time(c)),
+                   value     = as.numeric(c),
+                   seriesID  = r,
+                   item_name = n)
   return(df)
+}
+
+# Adding CPI's item names to the historical CPI data set
+# d = historical data set of BLS
+# l = data set of names
+bls.cpi.item_name <- function(d,l) {
+  k <- cpi.items[cpi.items$item_code %in% substr(l,9,nchar(l)),c(1,2)]
+  n <- nrow(k)
+  d$item_name <- c("") # empty column, where names will be stored
+  for (i in 1:n) {
+    d[d$seriesID==paste0("CUUR0000",k$item_code[i]),]$item_name <- k$item_name[i]
+  }
+  return(d)
 }
 
 # ------------------------  OPERATIONS  ----------------------------------------+
@@ -65,3 +84,11 @@ bls.cpi.yoy <- function(b,r) {
 use.library("stats")
 use.library("zoo")
 use.library("x12")
+use.library("rdbnomics")
+
+# --- US ECONOMY ---
+
+# Item codes for CPI details: https://download.bls.gov/pub/time.series/cu/cu.item
+# These are to be retrieved into the data set called cpi.items
+cpi.items <- read.csv("https://download.bls.gov/pub/time.series/cu/cu.item", 
+                      header = TRUE, sep = "\t")
