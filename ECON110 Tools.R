@@ -85,6 +85,9 @@ use.library("stats")
 use.library("zoo")
 use.library("x12")
 use.library("rdbnomics")
+use.library("devtools")
+
+install_github("mikeasilva/blsAPI")  # Installing R library for BLS
 
 # --- US ECONOMY ---
 
