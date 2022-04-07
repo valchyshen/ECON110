@@ -1,6 +1,6 @@
 ---
 title: "ECON110 Project"
-author: "[Student's Name]"
+author: "Oleksandr Valchyshen"
 date: "1/26/2022"
 output: html_document
 ---
@@ -112,8 +112,8 @@ Let's grab the most recent inflation data from BLS and graph it. I am interested
 
 p <- list(                                  # Creating list of data to be retrieved from BLS...
   "seriesid"        = c("CUUR0000SA0",      # All items
-                        "CUUR0000SETA02",   # Used cars and trucks
-                        "CUUR0000SAF11211"),# Meats
+                        "CUUR0000SETA02",     # Used cars and trucks
+                        "CUUR0000SAF11211"),  # Meats
   "startyear"       = 2016,                 # Start year in the time range,
   "endyear"         = year(Sys.Date()),     # ...current year is the end year of the time range 
   "registrationKey" = key.BLS               # BLS key
@@ -144,5 +144,111 @@ for (i in 1:length(p$seriesid)) {
 
 # Plotting the CPI data as year-on-year changes
 ggplot(cpi.yoy, aes(x=date,y=value,color=item_name)) + geom_line()
+
+```
+
+## Norway
+
+Money of account is Norwegian krone.
+
+Central Bank of Norway: https://www.norges-bank.no/en/
+
+Ministry of Finance: https://www.regjeringen.no/en/dep/fin/id216/
+
+### GDP (ID: CLVMNACSCAB1GQNO)
+
+``` {r echo=FALSE}
+# Grab the data on the exchange rate of US dollar to the euro
+# Note: the unique ID for this data in the FRED system is DEXUSEU
+t <- 
+  fredr(
+    series_id         = "CLVMNACSCAB1GQNO",
+    observation_start = as.Date("1950-01-01"),
+    observation_end   = Sys.Date()
+  )
+
+# Let's remove records from t, which does not contain data
+t <- na.omit(t)
+
+# Display first 6 records of the data set t
+tail(t[,1:3])
+
+```
+
+Now, let's plot the data. See below. 
+
+```{r echo=FALSE}
+
+ggplot(t, aes(x=date, y=value)) + geom_line(col="red")
+
+# GDP in real and seasonally-adjusted terms as a time series
+y <- as.numeric(format(t$date[1],"%Y"))
+q <- as.numeric(substr(quarters(t$date[1]),2,2))
+gdp.ts <- ts(data = t$value, start = c(y,q), frequency = 4)
+
+```
+
+__Determining the most recent business cycle__
+
+First step is to observe the chart above and spot two most recent peaks on the chart. Decide approximately after which year did the left-side peak take place. In the case of Norway it is 2015.
+
+Second step is to narrow the time series data on the country's GDP ```gdp.ts```. And then to build historical tables of (1) values of GDP in "chained" domestic money of account, and (2) real GDP growth rates in % SAAR terms. 
+
+```{r echo=TRUE}
+
+# Narrowing down the times series of the country's GDP adjusted for inflation
+gdp.ts <- window(gdp.ts, start = c(2015-1,1), frequency = 4)
+
+# GDP values in "chained" local money of account 
+#(adjusted for inflation and seasonality)
+gdp.ts
+
+# Real GDP growth rate, % SAAR
+((gdp.ts/lag(gdp.ts,-1))^4-1)*100 
+
+# Plotting the data set with country's GDP values to spot the peaks
+plot(gdp.ts, 
+     main = "Quarterly GDP, showing most recent business cycle",
+     sub  = "Millions of Norwegian krone, adjusted for inflation and seasonality",
+     xlab = "", 
+     ylab = "")
+
+```
+
+So, Peak #1 is 3Q (October) of 2015 and Peak #2 is 4Q (December) of 2019. Hence, __length of the business cycle is number of months between Oct-2015 and Dec-2019, which is 51 months (see below: 51 = 50 + 1) or 4 years and 1 quarter__. 
+
+```{r echo=TRUE}
+
+# By using R function called interval(), we can obtain the number of 
+# months between two dates
+interval(start = as.Date("2015-10-01"), end = as.Date("2019-12-01")) %/% months(1)
+
+```
+
+### Inflation (ID: NORCPIALLMINMEI)
+
+``` {r echo=FALSE}
+# Grab the data on the exchange rate of US dollar to the euro
+# Note: the unique ID for this data in the FRED system is DEXUSEU
+t <- 
+  fredr(
+    series_id         = "NORCPIALLMINMEI",
+    observation_start = as.Date("2012-01-01"),
+    observation_end   = Sys.Date()
+  )
+
+# Let's remove records from t, which does not contain data
+t <- na.omit(t)
+
+# Display first 6 records of the data set t
+tail(t[,1:3])
+
+```
+
+Now, let's plot the data. See below. 
+
+```{r echo=FALSE}
+
+ggplot(t, aes(x=date, y=value)) + geom_line(col="red")
 
 ```
