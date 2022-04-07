@@ -86,6 +86,7 @@ use.library("zoo")
 use.library("x12")
 use.library("rdbnomics")
 use.library("devtools")
+use.library("lubridate")
 
 install_github("mikeasilva/blsAPI")  # Installing R library for BLS
 
