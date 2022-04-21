@@ -228,8 +228,7 @@ interval(start = as.Date("2015-10-01"), end = as.Date("2019-12-01")) %/% months(
 ### Inflation (ID: NORCPIALLMINMEI)
 
 ``` {r echo=FALSE}
-# Grab the data on the exchange rate of US dollar to the euro
-# Note: the unique ID for this data in the FRED system is DEXUSEU
+# Grab the data for Norway's inflation
 t <- 
   fredr(
     series_id         = "NORCPIALLMINMEI",
@@ -250,5 +249,38 @@ Now, let's plot the data. See below.
 ```{r echo=FALSE}
 
 ggplot(t, aes(x=date, y=value)) + geom_line(col="red")
+
+# CPI index as a time series
+y <- as.numeric(format(t$date[1],"%Y"))
+m <- as.numeric(month(t$date[1]))
+cpi.ts <- ts(data = t$value, start = c(y,m), frequency = 12)
+# CPI as year-on-year time series
+cpi.yoy.ts <- (cpi.ts/lag(cpi.ts,-12)-1)*100 
+
+# CPI time series plot 
+plot(cpi.yoy.ts,
+     main = "History of Norway's CPI (% year-on-year)",
+     xlab = "",
+     ylab = "")
+
+window(cpi.yoy.ts, start=c(2020,1))
+
+```
+
+## Interest Rates: USA
+
+The corridor system of interest rates is the range of interest rates the central bank maintains daily in order to keep the overnight interest rate within the targeted range (corridor). 
+
+```{r echo=FALSE} 
+
+ir.corridor.us("1990-01-01")
+
+```
+
+Government bonds of different maturities have yields that fluctuate depending on the level of the overnight interest rate that follows the target set by the central bank's policy.
+
+```{r echo=FALSE} 
+
+ir.govt.us("1990-01-01")
 
 ```
